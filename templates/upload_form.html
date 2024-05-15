@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>图片列表</title>
+    <!-- 引入CSS样式表（示例） -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/dropzone.min.css') }}">
+
+</head>
+<body>
+    <h1>上传图片</h1>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <ul>
+            {% for category, message in messages %}
+                <li class="{{ category }}">{{ message }}</li>
+            {% endfor %}
+            </ul>
+        {% endif %}
+    {% endwith %}
+    <form action="{{ url_for('upload') }}" method="post" enctype="multipart/form-data" class="dropzone" id="myDropzone">
+        <input type="text" name="name" placeholder="输入图片名称" required>
+        <!-- 限制上传文件类型为图片 -->
+        <input type="file" name="pic" accept="image/*" required>
+        <input type="submit" value="上传">
+        <input type="reset" value="重置">
+    </form>
+    <h1>图片列表</h1>
+    <div>
+        <table>
+            <tr>
+                <th>id</th>
+                <th>name</th>
+                <th>pic</th>
+            </tr>
+            {% for pic in upload_form %}
+            <tr>
+                <td>{{ pic.id }}</td>
+                <td>{{ pic.name }}</td>
+                <td>
+                    <img src="{{pic.pic_url }}" alt="{{ pic.name }}" width="100">
+                </td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+    <!-- 分页导航 -->
+    <div class="pagination">
+    <nav aria-label="Page navigation example">
+        <ul class="pagination">
+        {% if upload_form.has_prev %}
+            <li class="page-item">
+                <a class="page-link" href="{{ url_for('upload_form', page=upload_form.prev_num) }}" >上一页</a>
+            </li>
+        {% endif %}
+        {% for page_num in upload_form.iter_pages(left_edge=1, right_edge=1, left_current=2, right_current=2) %}
+            {% if page_num %}
+                {% if page_num != upload_form.page %}
+                    <li class="page-item">
+                        <a class="page-link" href="{{ url_for('upload_form', page=page_num) }}">{{ page_num }}</a>
+                    </li>
+                {% else %}
+                    <li class="page-item active" aria-current="page"><a class="page-link">{{ page_num }}</a></li>
+                {% endif %}
+            {% endif %}
+        {% endfor %}
+        {% if upload_form.has_next %}
+            <li class="page-item">
+                <a class="page-link" href="{{ url_for('upload_form', page=upload_form.next_num) }}">下一页</a>
+            </li>
+        {% endif %}
+        </ul>
+    </nav>
+    </div>
+    <!-- 引入JS脚本（示例） -->
+{#    <script src="{{ url_for('static', filename='js/bootstrap.bundle.js') }}"></script>#}
+{#    <script src="{{ url_for('static', filename='js/bootstrap.js') }}"></script>#}
+     <script src="{{ url_for('static', filename='js/dropzone.min.js') }}"></script>
+</body>
+</html>
